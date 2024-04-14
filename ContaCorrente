@@ -1,0 +1,172 @@
+using System;
+using System.Data;
+// criar uma classe de conta corrente onde:
+// tem agencia, número, saldo,
+// saldo para saque e data de abertura
+// a agencia e o número só pode ser definido na criação da conta
+// e não pode mais ser alterado
+// o saldo só pode ser manipulado pelas operações 
+// de depósito e saque
+// a conta pode ser bronze, prata ou ouro de acordo 
+// com o tempo de relacionamento:
+// . até 5 anos: bronze com limite de 1 mil reais
+// . até 10 anos: prata com limite de 10 mil reais
+// . acima de 10 anos: ouro com limite de 50 mil reais
+
+// faça uma interface para permitir interagir com a conta
+
+// -----------------------------------
+//   [1] - Criar conta
+//   [2] - Mostrar saldo
+//   [3] - Sacar
+//   [4] - Depositar
+// -----------------------------------
+
+// ENUM PARA REPRESENTAR O RANK DAS CONTAS
+enum TipoConta {
+        Bronze,
+        Prata,
+        Ouro
+    }
+
+
+// Definindo a interface da Conta
+    interface IContaCorrente {
+        void CriarConta(int agencia, int numero);
+        decimal MostrarSaldo();
+        void Sacar(decimal valor);
+        void Depositar(decimal valor);
+    }
+
+
+// CLASSE DA CONTA CORRENTE
+    public class ContaCorrente{
+        // atributos
+        private int agencia;
+
+        private int numero;
+
+        private decimal saldo;
+
+        private decimal saldoParaSaque;
+
+        private DateTime dataAbertura;
+
+    
+// PROPRIEDADES SOMENTE LEITURA
+        public int Agencia { get;} // não possui setter portanto só pode ser definido no construtor
+        public int Numero { get; } // não possui setter portanto só pode ser definido no construtor
+
+// PROPRIEDADES PARA SALDO, SALDO PARA SAQUE E DATA DE ABERTURA
+        public decimal Saldo {get; private set;}
+        public decimal SaldoParaSaque {get; private set;}
+        public DateTime DataAbertura { get; private set;}
+
+// CONSTRUTOR DE CLASSE
+        public ContaCorrente(int agencia, int numero) {
+            Agencia = agencia;
+            Numero = numero;
+            Saldo = 0;
+            SaldoParaSaque = 0;
+            DataAbertura = DateTime.Now;
+           
+            Console.WriteLine("Conta criada com sucesso!");
+    }
+// MÉTODO PARA MOSTRAR SALDO DA CONTA
+        public decimal MostrarSaldo() {
+            return Saldo;
+        }
+// MÉTODO PARA SACAR DINHEIRO DA CONTA
+        public void Sacar(decimal valor) {
+            if (valor <= SaldoParaSaque) {
+                Saldo -= valor;
+                Console.WriteLine($"Saque de R${valor} realizado com sucesso.");
+            } else {
+                Console.WriteLine("Saldo insuficiente para efetuar o saque.");
+                }            
+        }
+
+// MÉTODO PARA DEPOSITAR DINHEIRO NA CONTA
+        public void Depositar(decimal valor) {
+            Saldo += valor;
+            SaldoParaSaque += valor;
+            Console.WriteLine($"Depósito de R${valor} realizado com sucesso");
+        }
+
+// MÉTODO PRIVADO QUE DETERMINA O TIPO DE CONTA COM BASE NO TEMPO DE ABERTURA DA CONTA
+        private TipoConta DeterminarTipoConta() {
+            TimeSpan tempoAbertura = DateTime.Now - DataAbertura;
+            if (tempoAbertura.TotalDays <- 1825) { //Até 5 anos (5 * 365 = 1825 dias)
+                return TipoConta.Bronze;
+            } else if (tempoAbertura.TotalDays <= 3650) { // Até 10 anos (10 * 365 = 3650 dias)
+                return TipoConta.Prata;
+            } else {
+                return TipoConta.Ouro;
+            }
+        }
+        
+    }
+    // CLASSE 
+     
+     class Program {
+            static void Main(string[] args) {
+               // Instanciar a conta corrente
+                ContaCorrente minhaConta = null;
+                
+
+
+
+            // Loop para a interface interativa
+            while (true) {
+                //Exibir as opções do menu
+                Console.WriteLine("\n--------------------------------------------------------");
+                Console.WriteLine("//    [1] - Criar conta");
+                Console.WriteLine("//    [2] - Mostrar saldo");
+                Console.WriteLine("//    [3] - Sacar");
+                Console.WriteLine("//    [4] - Depositar");
+                Console.WriteLine("\n--------------------------------------------------------");
+                Console.WriteLine("Escolha uma opção: ");
+
+                //LER A OPÇÃO ESCOLHIDA PELO USUARIO
+                string opcao = Console.ReadLine();
+
+                //EXECUTAR A OPÇAO ESCOLHIDA PELO USUÁRIO
+            switch (opcao) {
+                case "1":
+                    Console.WriteLine("Digite a agência");
+                    int agencia = int.Parse(Console.ReadLine());
+                    int numero = int.Parse(Console.ReadLine());
+                    minhaConta = new ContaCorrente(agencia, numero);
+                    Console.WriteLine("Conta criada com sucesso!");
+                    break;
+                case "2":
+                    if (minhaConta == null) {
+                        Console.WriteLine("Crie uma conta antes de verificar o saldo.");
+                    }   else {
+                        Console.WriteLine("Saldo atual: R$" + minhaConta.MostrarSaldo());
+                    }
+                    break;
+                case "3":
+                    if (minhaConta == null) {
+                        Console.WriteLine("Crie uma conta antes de fazer um saque");
+                    }   else {
+                        Console.WriteLine("Digite o valor a ser sacado: ");
+                        decimal valorSaque = decimal.Parse(Console.ReadLine());
+                        minhaConta.Sacar(valorSaque);
+                    }
+                    break;
+                case "4":
+                    if (minhaConta == null) {
+                        Console.WriteLine("Crie uma conta antes de fazer um depósito");
+                    }   else {
+                        Console.WriteLine("Digite o valor a ser depositado: ");
+                        decimal valorDeposito = decimal.Parse(Console.ReadLine());
+                        minhaConta.Depositar(valorDeposito);
+                    }      
+                    break;
+                default: Console.WriteLine("Opção inválida. Tente novamente");
+                break;
+            }
+            }
+        }
+     }
